@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Для тебя ❤️</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    font-family: "Segoe UI", system-ui, sans-serif;
+    background: #111;
+  }
+
+  :root {
+    --rose-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='none' stroke='white' stroke-width='2.2' opacity='.28'%3E%3Cpath d='M89 52c-18-22-48-4-35 18-24 3-25 36 0 40-8 23 22 37 35 17 13 20 43 6 35-17 25-4 24-37 0-40 13-22-17-40-35-18Z'/%3E%3Cpath d='M89 58c-10 9-15 18-14 29 1 12 8 21 14 29 6-8 13-17 14-29 1-11-4-20-14-29Z'/%3E%3Cpath d='M89 127v32M89 144c-15-8-23-7-32 2M89 151c14-10 23-10 33-2'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .screen.active { display: flex; animation: fade .7s ease both; }
+  @keyframes fade { from { opacity: 0; transform: scale(1.02); } to { opacity: 1; transform: scale(1); } }
+
+  /* PASSWORD */
+  #passwordScreen {
+    display: flex;
+    background:
+      linear-gradient(rgba(16,16,20,.62), rgba(16,16,20,.72)),
+      var(--rose-svg),
+      radial-gradient(circle at 20% 10%, #57435f 0, transparent 35%),
+      radial-gradient(circle at 80% 80%, #2b1b31 0, transparent 40%),
+      #141218;
+    background-size: auto, 180px 180px, auto, auto, auto;
+  }
+  .login-card {
+    width: min(420px, 88vw);
+    padding: 36px 28px;
+    border: 1px solid rgba(255,255,255,.35);
+    border-radius: 28px;
+    background: rgba(255,255,255,.10);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 20px 70px rgba(0,0,0,.45);
+    color: white;
+    text-align: center;
+  }
+  .login-card h1 { font-size: clamp(30px, 6vw, 48px); margin-bottom: 10px; }
+  .login-card p { opacity: .78; margin-bottom: 24px; }
+  .login-card input {
+    width: 100%;
+    padding: 15px 18px;
+    border: 1px solid rgba(255,255,255,.35);
+    border-radius: 16px;
+    outline: none;
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    font-size: 17px;
+    text-align: center;
+  }
+  .login-card button {
+    width: 100%;
+    margin-top: 14px;
+    padding: 15px;
+    border: 0;
+    border-radius: 16px;
+    background: white;
+    color: #231b27;
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+    transition: .25s;
+  }
+  .login-card button:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,255,255,.18); }
+  #passwordError { height: 22px; margin-top: 12px; color: #ffd1d1; font-size: 14px; }
+
+  /* MAIN */
+  #home {
+    background:
+      linear-gradient(rgba(20,17,22,.58), rgba(20,17,22,.72)),
+      var(--rose-svg),
+      radial-gradient(circle at 50% 20%, #755a7c 0, transparent 36%),
+      linear-gradient(135deg, #1b171c, #2d2630);
+    background-size: auto, 180px 180px, auto, auto;
+    color: white;
+    text-align: center;
+    padding: 24px;
+  }
+  .home-wrap { position: relative; z-index: 2; }
+  .home-wrap h2 { font-size: clamp(34px, 7vw, 70px); margin-bottom: 12px; }
+  .home-wrap p { opacity: .8; font-size: clamp(15px, 2.5vw, 20px); margin-bottom: 38px; }
+  .hearts-menu {
+    display: flex;
+    gap: clamp(18px, 5vw, 42px);
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .heart-btn {
+    width: clamp(94px, 18vw, 145px);
+    aspect-ratio: 1;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: clamp(78px, 15vw, 128px);
+    line-height: 1;
+    filter: drop-shadow(0 15px 20px rgba(0,0,0,.35));
+    transition: transform .25s, filter .25s;
+  }
+  .heart-btn:hover { transform: translateY(-8px) scale(1.08); filter: drop-shadow(0 20px 28px rgba(0,0,0,.45)); }
+  .white-heart { color: #fff; text-shadow: 0 0 2px #aaa; }
+  .red-heart { color: #e61d36; }
+  .purple-heart { color: #8b3fe0; }
+
+  /* COLOR PAGES */
+  .color-page {
+    color: white;
+    text-align: center;
+    padding: 80px 20px 30px;
+  }
+  #redPage { background: radial-gradient(circle at top, #ff6476, #c90f2a 55%, #7a0014); }
+  #whitePage { background: radial-gradient(circle at top, #ffffff, #f3f3f3 60%, #dcdcdc); color: #2c2c2c; }
+  #purplePage { background: radial-gradient(circle at top, #b87aff, #7b2ac8 56%, #3b0b69); }
+
+  .content-card {
+    position: relative;
+    z-index: 3;
+    width: min(760px, 92vw);
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    padding: 30px;
+    border-radius: 28px;
+    background: rgba(255,255,255,.16);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,.28);
+    box-shadow: 0 20px 70px rgba(0,0,0,.25);
+  }
+  #whitePage .content-card {
+    background: rgba(255,255,255,.68);
+    border-color: rgba(0,0,0,.08);
+  }
+  .content-card h2 { font-size: clamp(30px, 6vw, 56px); margin-bottom: 18px; }
+  .content-card p { font-size: clamp(16px, 2.5vw, 21px); line-height: 1.7; white-space: pre-line; }
+
+  .photo-wrap {
+    width: min(360px, 78vw);
+    aspect-ratio: 4/5;
+    margin: 0 auto 22px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 18px 42px rgba(0,0,0,.32);
+    border: 4px solid rgba(255,255,255,.65);
+    background: rgba(255,255,255,.15);
+    display: grid;
+    place-items: center;
+  }
+  .photo-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-placeholder { padding: 20px; font-weight: 700; opacity: .8; }
+
+  .back {
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    z-index: 5;
+    border: 1px solid rgba(255,255,255,.4);
+    background: rgba(0,0,0,.18);
+    color: white;
+    padding: 11px 17px;
+    border-radius: 999px;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    font-weight: 700;
+  }
+  #whitePage .back { color: #222; background: rgba(255,255,255,.65); border-color: rgba(0,0,0,.12); }
+
+  /* FLOATING HEARTS */
+  .floating-hearts {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .float-heart {
+    position: absolute;
+    bottom: -60px;
+    opacity: .65;
+    animation: rise linear infinite;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,.18));
+  }
+  @keyframes rise {
+    0%   { transform: translateY(0) translateX(0) rotate(0deg) scale(.75); opacity: 0; }
+    12%  { opacity: .75; }
+    55%  { transform: translateY(-55vh) translateX(28px) rotate(16deg) scale(1); }
+    100% { transform: translateY(-120vh) translateX(-18px) rotate(-12deg) scale(1.2); opacity: 0; }
+  }
+
+  .hint {
+    position: absolute;
+    bottom: 18px;
+    font-size: 13px;
+    opacity: .65;
+    z-index: 4;
+  }
+
+  @media (max-width: 520px) {
+    .content-card { padding: 22px 18px; }
+    .heart-btn { width: 92px; font-size: 84px; }
+    .hearts-menu { gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- EKRAN HASŁA -->
+<section id="passwordScreen" class="screen">
+  <div class="login-card">
+    <h1>🤍 Для тебя</h1>
+    <p>Напиши пароль что бы зайти</p>
+    <input id="passwordInput" type="password" placeholder="Пароль..." autocomplete="off" />
+    <button id="enterBtn">Открыть</button>
+    <div id="passwordError"></div>
+  </div>
+</section>
+
+<!-- STRONA GŁÓWNA -->
+<section id="home" class="screen">
+  <div class="home-wrap">
+    <h2>Какое хочешь?</h2>
+    <p>Открывай все ✨</p>
+    <div class="hearts-menu">
+      <button class="heart-btn white-heart" onclick="openPage('whitePage')" aria-label="Białe serce">♥</button>
+      <button class="heart-btn red-heart" onclick="openPage('redPage')" aria-label="Czerwone serce">♥</button>
+      <button class="heart-btn purple-heart" onclick="openPage('purplePage')" aria-label="Fioletowe serce">♥</button>
+    </div>
+  </div>
+  <div class="hint">Нажми на сердечко ❤️</div>
+</section>
+
+<!-- CZERWONE SERCE -->
+<section id="redPage" class="screen color-page">
+  <button class="back" onclick="goHome()">← Назад</button>
+  <div class="floating-hearts" data-color="#ffffff"></div>
+
+  <div class="content-card">
+    <h2><b>❤️Together forever baby❤️</b></h2>
+
+    <div class="photo-wrap">
+      <!-- Wrzuć zdjęcie o nazwie "zdjecie.jpg" do tego samego folderu co ten plik HTML -->
+      <img src="zdjecie.jpg" alt="Nasze zdjęcie"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <div class="photo-placeholder" style="display:none;">
+        <img src="my.jpg" alt="Zdjęcie" width="300">
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- BIAŁE SERCE -->
+<section id="whitePage" class="screen color-page">
+  <button class="back" onclick="goHome()">← Назад</button>
+  <div class="floating-hearts" data-color="#e7caca"></div>
+
+  <div class="content-card">
+    <h2>🤍</h2>
+    <p>
+Я обещаю любить тебя всегда. Останься со мной навсегда.
+ Мне безумно нравится твоя улыбка и твои глаза.
+ Я хочу, чтобы мы были вместе, общались каждый день
+ и я обещаю, что никогда не оставлю тебя одну.
+ Будь моей.
+ Я знаю, что ты, возможно, проигнорируешь это сообщение
+ но просто знай: я тебя люблю.
+ И буду любить всегда.
+ Сколько бы времени ни прошло
+ ты всегда будешь в моем сердце на первом месте.
+    </p>
+  </div>
+</section>
+
+<!-- FIOLETOWE SERCE -->
+<section id="purplePage" class="screen color-page">
+  <button class="back" onclick="goHome()">← Назад</button>
+  <div class="floating-hearts" data-color="#ffffff"></div>
+
+  <div class="content-card">
+    <h2>💜</h2>
+    <p>
+Мы так летали высоко ман, верили в любовь
+Это планета моих снов, да, правда далеко
+Я убивал две пачки в день, я угрожал себе брательник
+Залетал куда не лень и осваивал систему💜
+    </p>
+  </div>
+</section>
+
+<script>
+  
+  const PASSWORD = "11092026";
+
+  const passwordScreen = document.getElementById("passwordScreen");
+  const home = document.getElementById("home");
+  const input = document.getElementById("passwordInput");
+  const error = document.getElementById("passwordError");
+  const enterBtn = document.getElementById("enterBtn");
+
+  function checkPassword() {
+    if (input.value === PASSWORD) {
+      passwordScreen.style.display = "none";
+      home.classList.add("active");
+      error.textContent = "";
+    } else {
+      error.textContent = "Неверный пароль 🤍";
+      input.value = "";
+      input.focus();
+    }
+  }
+
+  enterBtn.addEventListener("click", checkPassword);
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") checkPassword();
+  });
+
+  function openPage(id) {
+    document.querySelectorAll(".screen").forEach(s => {
+      s.classList.remove("active");
+      if (s.id !== "passwordScreen") s.style.display = "none";
+    });
+    const page = document.getElementById(id);
+    page.style.display = "flex";
+    requestAnimationFrame(() => page.classList.add("active"));
+  }
+
+  function goHome() {
+    document.querySelectorAll(".screen").forEach(s => {
+      s.classList.remove("active");
+      if (s.id !== "passwordScreen") s.style.display = "none";
+    });
+    home.style.display = "flex";
+    requestAnimationFrame(() => home.classList.add("active"));
+  }
+
+  // Generowanie unoszących się serduszek
+  document.querySelectorAll(".floating-hearts").forEach(container => {
+    const color = container.dataset.color || "#fff";
+
+    for (let i = 0; i < 26; i++) {
+      const heart = document.createElement("span");
+      heart.className = "float-heart";
+      heart.textContent = "♥";
+      heart.style.left = Math.random() * 100 + "%";
+      heart.style.color = color;
+      heart.style.fontSize = (12 + Math.random() * 30) + "px";
+      heart.style.animationDuration = (6 + Math.random() * 8) + "s";
+      heart.style.animationDelay = (-Math.random() * 12) + "s";
+      container.appendChild(heart);
+    }
+  });
+</script>
+
+</body>
+</html>
